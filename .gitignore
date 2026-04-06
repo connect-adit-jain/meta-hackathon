@@ -1,9 +1,0 @@
-__pycache__/
-.venv/
-.venv311/
-.pytest_cache/
-.venv_new/
-report.html
-test_report.txt
-pip_err.txt
-demo_output.txt
