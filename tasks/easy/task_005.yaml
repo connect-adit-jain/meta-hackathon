@@ -1,0 +1,19 @@
+id: easy_005
+title: "Fix Missing Quote"
+description: "A string literal is missing its closing quote."
+buggy_code: |
+  def make_greeting(first, last):
+      return "Welcome, " + first + " " + last + "!
+error_message: "SyntaxError: EOL while scanning string literal"
+expected_output: "make_greeting('Jane', 'Doe') should return 'Welcome, Jane Doe!'"
+test_cases:
+  - input: "make_greeting('Jane', 'Doe')"
+    expected: "Welcome, Jane Doe!"
+  - input: "make_greeting('A', 'B')"
+    expected: "Welcome, A B!"
+correct_solution: |
+  def make_greeting(first, last):
+      return "Welcome, " + first + " " + last + "!"
+hints:
+  - "Check that every string literal is properly closed"
+  - "Look at the end of the return line"

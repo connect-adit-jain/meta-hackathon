@@ -1,0 +1,33 @@
+id: medium_001
+title: "Fix Off-By-One in Factorial"
+description: "The factorial function uses an incorrect range, producing wrong results."
+buggy_code: |
+  def factorial(n):
+      if n == 0:
+          return 1
+      result = 1
+      for i in range(1, n):
+          result *= i
+      return result
+error_message: "Wrong output: factorial(5) returns 24 instead of 120"
+expected_output: "factorial(5) should return 120"
+test_cases:
+  - input: "factorial(5)"
+    expected: "120"
+  - input: "factorial(0)"
+    expected: "1"
+  - input: "factorial(1)"
+    expected: "1"
+  - input: "factorial(6)"
+    expected: "720"
+correct_solution: |
+  def factorial(n):
+      if n == 0:
+          return 1
+      result = 1
+      for i in range(1, n + 1):
+          result *= i
+      return result
+hints:
+  - "Check the range boundary"
+  - "range(1, n) excludes n itself"

@@ -1,0 +1,46 @@
+id: hard_004
+title: "Fix Binary Search with Multiple Bugs"
+description: >
+  The binary search has three interacting bugs: wrong initial right boundary,
+  wrong loop condition, and missing mid adjustment causing potential infinite loops.
+buggy_code: |
+  def binary_search(arr, target):
+      left = 0
+      right = len(arr)
+      while left < right:
+          mid = (left + right) // 2
+          if arr[mid] == target:
+              return mid
+          elif arr[mid] < target:
+              left = mid
+          else:
+              right = mid
+      return -1
+error_message: "Infinite loop or wrong result: binary_search([1,2,3,4,5], 5) never terminates; binary_search([1,2,3], 4) should return -1"
+expected_output: "binary_search([1,2,3,4,5], 3) → 2, binary_search([1,2,3], 4) → -1"
+test_cases:
+  - input: "binary_search([1, 2, 3, 4, 5], 3)"
+    expected: "2"
+  - input: "binary_search([1, 2, 3, 4, 5], 1)"
+    expected: "0"
+  - input: "binary_search([1, 2, 3], 4)"
+    expected: "-1"
+  - input: "binary_search([10], 10)"
+    expected: "0"
+correct_solution: |
+  def binary_search(arr, target):
+      left = 0
+      right = len(arr) - 1
+      while left <= right:
+          mid = (left + right) // 2
+          if arr[mid] == target:
+              return mid
+          elif arr[mid] < target:
+              left = mid + 1
+          else:
+              right = mid - 1
+      return -1
+hints:
+  - "right should start at len(arr) - 1 for inclusive bounds"
+  - "left = mid can cause infinite loops — use mid + 1"
+  - "The loop should continue while left <= right, not left < right"

@@ -1,0 +1,21 @@
+id: medium_004
+title: "Fix Reverse String Bug"
+description: "The reverse_string function uses wrong slice step, returning the original string."
+buggy_code: |
+  def reverse_string(s):
+      return s[::1]
+error_message: "Wrong output: reverse_string('hello') returns 'hello' instead of 'olleh'"
+expected_output: "reverse_string('hello') should return 'olleh'"
+test_cases:
+  - input: "reverse_string('hello')"
+    expected: "olleh"
+  - input: "reverse_string('abc')"
+    expected: "cba"
+  - input: "reverse_string('a')"
+    expected: "a"
+correct_solution: |
+  def reverse_string(s):
+      return s[::-1]
+hints:
+  - "Slice step of 1 goes forward, not backward"
+  - "Use a negative step to reverse"

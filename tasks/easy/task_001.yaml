@@ -1,0 +1,21 @@
+id: easy_001
+title: "Fix Missing Operand"
+description: "The add function is missing the second operand in its return statement."
+buggy_code: |
+  def add(a, b):
+      return a +
+error_message: "SyntaxError: invalid syntax (line 2)"
+expected_output: "add(1, 2) should return 3"
+test_cases:
+  - input: "add(1, 2)"
+    expected: "3"
+  - input: "add(-1, 5)"
+    expected: "4"
+  - input: "add(0, 0)"
+    expected: "0"
+correct_solution: |
+  def add(a, b):
+      return a + b
+hints:
+  - "The return statement is incomplete"
+  - "The + operator requires two operands"

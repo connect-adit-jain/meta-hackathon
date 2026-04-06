@@ -1,0 +1,33 @@
+id: medium_002
+title: "Fix Wrong Comparison in find_max"
+description: "find_max returns the minimum instead of the maximum due to a flipped comparison."
+buggy_code: |
+  def find_max(numbers):
+      if not numbers:
+          return None
+      max_val = numbers[0]
+      for num in numbers[1:]:
+          if num < max_val:
+              max_val = num
+      return max_val
+error_message: "Wrong output: find_max([3, 7, 2, 8, 1]) returns 1 instead of 8"
+expected_output: "find_max([3, 7, 2, 8, 1]) should return 8"
+test_cases:
+  - input: "find_max([3, 7, 2, 8, 1])"
+    expected: "8"
+  - input: "find_max([1])"
+    expected: "1"
+  - input: "find_max([-5, -2, -10])"
+    expected: "-2"
+correct_solution: |
+  def find_max(numbers):
+      if not numbers:
+          return None
+      max_val = numbers[0]
+      for num in numbers[1:]:
+          if num > max_val:
+              max_val = num
+      return max_val
+hints:
+  - "Check the comparison operator"
+  - "To find max, you need to update when a value is GREATER"

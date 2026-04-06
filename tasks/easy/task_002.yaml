@@ -1,0 +1,21 @@
+id: easy_002
+title: "Fix Missing Colon"
+description: "The function definition is missing a colon after the parameter list."
+buggy_code: |
+  def greet(name)
+      return f"Hello, {name}!"
+error_message: "SyntaxError: expected ':' (line 1)"
+expected_output: "greet('World') should return 'Hello, World!'"
+test_cases:
+  - input: "greet('World')"
+    expected: "Hello, World!"
+  - input: "greet('Alice')"
+    expected: "Hello, Alice!"
+  - input: "greet('OpenEnv')"
+    expected: "Hello, OpenEnv!"
+correct_solution: |
+  def greet(name):
+      return f"Hello, {name}!"
+hints:
+  - "Function definitions require a colon"
+  - "Look at the def line carefully"
