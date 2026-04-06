@@ -1,0 +1,39 @@
+spec_version: 1
+name: bloodbank
+type: space
+description: >
+  A hospital blood bank inventory and allocation environment simulating
+  real-world healthcare logistics. The agent must manage perishable blood unit
+  inventory across 8 blood types, fulfill transfusion requests while ensuring
+  ABO/Rh compatibility, prioritise emergencies, minimise expiry wastage, and
+  adapt to stochastic donation-camp inflows. Inspired by daily operational
+  challenges faced by hospital blood bank staff in India and globally, where
+  blood shortages and mismatched transfusions cost lives.
+version: "1.0.0"
+runtime: fastapi
+app: server.app:app
+port: 8000
+
+tasks:
+  - name: basic_compatibility
+    description: >
+      Basic Compatibility & Fulfillment – the agent must correctly match blood
+      types (ABO/Rh) and maximise request fulfillment rate. Grader checks
+      zero incompatible allocations and high fulfillment percentage.
+    difficulty: easy
+
+  - name: expiry_aware_rotation
+    description: >
+      Expiry-Aware Stock Rotation – the agent must preferentially allocate
+      near-expiry units first (FEFO strategy) and minimise total wastage
+      from expired units. Grader measures near-expiry-first usage ratio and
+      overall wastage rate.
+    difficulty: medium
+
+  - name: adaptive_management
+    description: >
+      Adaptive Management Under Uncertainty – the agent must handle stochastic
+      donation camp inflows, prioritise emergency requests, maintain balanced
+      stock across all 8 blood types, and keep wastage under 5% while fulfilling
+      >90% emergencies promptly. Full composite grader.
+    difficulty: hard
