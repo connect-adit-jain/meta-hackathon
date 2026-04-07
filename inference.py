@@ -250,35 +250,54 @@ def run_inference() -> None:
             steps = step_num
             error_msg = None
 
-            try:
-                # Ask LLM for action
-                user_prompt = build_user_prompt(observation)
-                chat_resp = llm.chat.completions.create(
-                    model=MODEL_NAME,
-                    messages=[
-                        {"role": "system", "content": SYSTEM_PROMPT},
-                        {"role": "user", "content": user_prompt},
-                    ],
-                    temperature=TEMPERATURE,
-                    max_tokens=200,
-                )
-                raw_action = chat_resp.choices[0].message.content or '{"skip": true}'
-                action_dict = parse_llm_action(raw_action)
+            # Rate-limit guard: wait between API calls to avoid 429 errors
+            # Gemini free tier = 15 req/min, so 1 request every 4+ seconds
+            if step_num > 1:
+                time.sleep(5)
 
-                # Send action to environment
-                step_resp = env.post("/step", json=action_dict)
-                step_resp.raise_for_status()
-                step_data = step_resp.json()
+            # Retry logic: if we get a 429 rate-limit, wait and retry
+            max_retries = 3
+            for attempt in range(max_retries + 1):
+                try:
+                    user_prompt = build_user_prompt(observation)
+                    chat_resp = llm.chat.completions.create(
+                        model=MODEL_NAME,
+                        messages=[
+                            {"role": "system", "content": SYSTEM_PROMPT},
+                            {"role": "user", "content": user_prompt},
+                        ],
+                        temperature=TEMPERATURE,
+                        max_tokens=200,
+                    )
+                    raw_action = chat_resp.choices[0].message.content or '{"skip": true}'
+                    action_dict = parse_llm_action(raw_action)
 
-                observation = step_data["observation"]
-                reward = step_data["reward"]
-                done = step_data["done"]
+                    # Send action to environment
+                    step_resp = env.post("/step", json=action_dict)
+                    step_resp.raise_for_status()
+                    step_data = step_resp.json()
 
-            except Exception as e:
-                error_msg = str(e)
-                reward = 0.0
-                action_dict = {"skip": True, "error": error_msg}
-                done = False
+                    observation = step_data["observation"]
+                    reward = step_data["reward"]
+                    done = step_data["done"]
+                    break  # success, exit retry loop
+
+                except Exception as e:
+                    error_text = str(e)
+                    if "429" in error_text and attempt < max_retries:
+                        wait_time = 60 * (attempt + 1)
+                        print(
+                            f"  [RATE-LIMIT] Hit quota limit at step {step_num}. "
+                            f"Waiting {wait_time}s before retry {attempt + 1}/{max_retries}...",
+                            flush=True,
+                        )
+                        time.sleep(wait_time)
+                        continue
+                    error_msg = error_text
+                    reward = 0.0
+                    action_dict = {"skip": True, "error": error_msg}
+                    done = False
+                    break
 
             rewards.append(reward)
             action_json = json.dumps(action_dict, separators=(",", ":"))
