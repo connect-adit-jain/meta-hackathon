@@ -2,7 +2,7 @@
 title: BloodBank Environment
 emoji: 🩸
 colorFrom: red
-colorTo: white
+colorTo: gray
 sdk: docker
 app_port: 7860
 license: mit
