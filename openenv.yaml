@@ -12,7 +12,7 @@ description: >
 version: "1.0.0"
 runtime: fastapi
 app: server.app:app
-port: 8000
+port: 7860
 
 tasks:
   - name: basic_compatibility

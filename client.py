@@ -22,13 +22,13 @@ class BloodBankClient:
     Synchronous HTTP client for the BloodBank environment.
 
     Usage:
-        client = BloodBankClient(base_url="http://localhost:8000")
+        client = BloodBankClient(base_url="http://localhost:7860")
         obs = client.reset(task_name="basic_compatibility")
         obs, reward, done, info = client.step(BloodBankAction(request_id=0, donor_blood_type="O+"))
         score = client.grade()
     """
 
-    def __init__(self, base_url: str = "http://localhost:8000", timeout: float = 30.0):
+    def __init__(self, base_url: str = "http://localhost:7860", timeout: float = 30.0):
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self._client = httpx.Client(timeout=timeout)
@@ -86,12 +86,12 @@ class AsyncBloodBankClient:
     Asynchronous HTTP client for the BloodBank environment.
 
     Usage:
-        async with AsyncBloodBankClient("http://localhost:8000") as client:
+        async with AsyncBloodBankClient("http://localhost:7860") as client:
             obs = await client.reset()
             obs, reward, done, info = await client.step(action)
     """
 
-    def __init__(self, base_url: str = "http://localhost:8000", timeout: float = 30.0):
+    def __init__(self, base_url: str = "http://localhost:7860", timeout: float = 30.0):
         self.base_url = base_url.rstrip("/")
         self._client = httpx.AsyncClient(timeout=timeout)
 

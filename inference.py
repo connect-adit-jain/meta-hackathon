@@ -13,7 +13,7 @@ Environment Variables:
     API_BASE_URL   – OpenAI-compatible API endpoint
     MODEL_NAME     – Model identifier (e.g. "meta-llama/Llama-3-8B-Instruct")
     HF_TOKEN       – HuggingFace token for authentication
-    ENV_URL        – BloodBank server URL (default http://localhost:8000)
+    ENV_URL        – BloodBank server URL (default http://localhost:7860)
     TASK_NAME      – Task to run (default "basic_compatibility")
     MAX_STEPS      – Maximum steps per episode (default 30)
 
@@ -39,7 +39,7 @@ from openai import OpenAI
 API_BASE_URL = os.environ.get("API_BASE_URL", "https://api.openai.com/v1")
 MODEL_NAME = os.environ.get("MODEL_NAME", "gpt-4o-mini")
 HF_TOKEN = os.environ.get("HF_TOKEN", "")
-ENV_URL = os.environ.get("ENV_URL", "http://localhost:8000")
+ENV_URL = os.environ.get("ENV_URL", "http://localhost:7860")
 TASK_NAME = os.environ.get("TASK_NAME", "basic_compatibility")
 MAX_STEPS = int(os.environ.get("MAX_STEPS", "30"))
 TEMPERATURE = 0.3

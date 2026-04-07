@@ -1,3 +1,13 @@
+---
+title: BloodBank Environment
+emoji: 🩸
+colorFrom: red
+colorTo: white
+sdk: docker
+app_port: 7860
+license: mit
+---
+
 # 🩸 BloodBank – Hospital Blood Bank RL Environment
 
 > **Meta PyTorch OpenEnv Hackathon × SST 2026 – Round 1 Submission**
