@@ -10,12 +10,26 @@ standardised stdout logs in the mandated format:
     [END]   success=true/false steps=<n> score=XX.XXX rewards=0.00,0.00,...
 
 Environment Variables:
-    API_BASE_URL   – OpenAI-compatible API endpoint
-    MODEL_NAME     – Model identifier (e.g. "meta-llama/Llama-3-8B-Instruct")
-    HF_TOKEN       – HuggingFace token for authentication
+    API_BASE_URL   – Chat completions endpoint (see examples below)
+    MODEL_NAME     – Model identifier (see examples below)
+    API_KEY        – Your API key for the chosen provider
     ENV_URL        – BloodBank server URL (default http://localhost:7860)
     TASK_NAME      – Task to run (default "basic_compatibility")
     MAX_STEPS      – Maximum steps per episode (default 30)
+
+Supported Providers (examples):
+    ┌──────────┬──────────────────────────────────────────────────────────┬─────────────────────────┐
+    │ Provider │ API_BASE_URL                                           │ MODEL_NAME              │
+    ├──────────┼──────────────────────────────────────────────────────────┼─────────────────────────┤
+    │ Gemini   │ https://generativelanguage.googleapis.com/v1beta/openai/│ gemini-2.0-flash        │
+    │ Claude   │ https://api.anthropic.com/v1/                          │ claude-sonnet-4-20250514│
+    │ OpenAI   │ https://api.openai.com/v1                              │ gpt-4o-mini             │
+    │ MiniMax  │ https://api.minimax.chat/v1                            │ MiniMax-Text-01         │
+    │ Groq     │ https://api.groq.com/openai/v1                        │ llama-3.3-70b-versatile │
+    │ Together │ https://api.together.xyz/v1                            │ meta-llama/Llama-3-70b  │
+    └──────────┴──────────────────────────────────────────────────────────┴─────────────────────────┘
+
+    Just set API_KEY, API_BASE_URL, and MODEL_NAME for your provider. That's it.
 
 Designed to run within 20 minutes on 2 vCPU / 8 GB RAM.
 """
@@ -36,9 +50,20 @@ from openai import OpenAI
 # ---------------------------------------------------------------------------
 # Configuration from environment variables
 # ---------------------------------------------------------------------------
-API_BASE_URL = os.environ.get("API_BASE_URL", "https://api.openai.com/v1")
-MODEL_NAME = os.environ.get("MODEL_NAME", "gpt-4o-mini")
-HF_TOKEN = os.environ.get("HF_TOKEN", "")
+API_BASE_URL = os.environ.get("API_BASE_URL", "https://generativelanguage.googleapis.com/v1beta/openai/")
+MODEL_NAME = os.environ.get("MODEL_NAME", "gemini-2.0-flash")
+
+# Generic API_KEY – works with ANY provider.
+# Also checks legacy OPENAI_API_KEY and HF_TOKEN as fallbacks for compatibility.
+API_KEY = (
+    os.environ.get("API_KEY")
+    or os.environ.get("GEMINI_API_KEY")
+    or os.environ.get("CLAUDE_API_KEY")
+    or os.environ.get("OPENAI_API_KEY")
+    or os.environ.get("HF_TOKEN")
+    or ""
+)
+
 ENV_URL = os.environ.get("ENV_URL", "http://localhost:7860")
 TASK_NAME = os.environ.get("TASK_NAME", "basic_compatibility")
 MAX_STEPS = int(os.environ.get("MAX_STEPS", "30"))
@@ -178,14 +203,24 @@ def parse_llm_action(response_text: str) -> Dict[str, Any]:
 
 def run_inference() -> None:
     """Run one episode of the BloodBank environment with the LLM agent."""
-    # Initialise LLM client
-    client_kwargs: Dict[str, Any] = {"base_url": API_BASE_URL}
-    if HF_TOKEN:
-        client_kwargs["api_key"] = HF_TOKEN
-    else:
-        client_kwargs["api_key"] = os.environ.get("OPENAI_API_KEY", "dummy")
 
-    llm = OpenAI(**client_kwargs)
+    if not API_KEY:
+        print(
+            "ERROR: No API key found. Set one of these environment variables:\n"
+            "  API_KEY        (generic, works with any provider)\n"
+            "  GEMINI_API_KEY (for Google Gemini)\n"
+            "  CLAUDE_API_KEY (for Anthropic Claude)\n"
+            "  OPENAI_API_KEY (for OpenAI)\n",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    # Initialise LLM client – the OpenAI Python library supports any
+    # OpenAI-compatible endpoint (Gemini, Claude, Groq, Together, etc.)
+    llm = OpenAI(
+        api_key=API_KEY,
+        base_url=API_BASE_URL,
+    )
 
     # Create HTTP client for the environment
     env = httpx.Client(base_url=ENV_URL, timeout=30.0)
